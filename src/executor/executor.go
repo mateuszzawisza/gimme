@@ -4,29 +4,30 @@ import (
     "fmt"
     "os/exec"
     "sync"
+    "job"
 )
 
 func Execute(job string) {
-    out,err := exec.Command("sh", "-c", job).Output()
+    _,err := exec.Command("sh", "-c", job).Output()
     if err != nil {
-        fmt.Printf("[%s] failed\n",job)
-    }else {
-        fmt.Printf("[%s] %s\n",job, out)
+        fmt.Printf("  Failed executing command: \"%s\"\n",job)
     }
 }
 
-func asyncExecute(commands []string, wg_handle *sync.WaitGroup) {
+func asyncExecute(name string, task job.Job, wg_handle *sync.WaitGroup) {
     defer wg_handle.Done()
-    for i:= range commands{
-        Execute(commands[i])
+    fmt.Printf("Starting %s\n", name)
+    for i:= range task.Command{
+        Execute(task.Command[i])
     }
+    fmt.Printf("Finished %s\n", name)
 }
 
-func AsyncExecuteJobs(jobs_list [][]string) {
+func AsyncExecuteJobs(jobs_list map[string]job.Job) {
     var wg sync.WaitGroup
-    for i:= range jobs_list {
+    for name,jobs:= range jobs_list {
         wg.Add(1)
-        go asyncExecute(jobs_list[i], &wg)
+        go asyncExecute(name,jobs, &wg)
     }
     wg.Wait()
 }
