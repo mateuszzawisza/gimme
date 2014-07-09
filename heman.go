@@ -1,11 +1,10 @@
 package main
 
 import "executor"
+import "job"
+
 
 func main() {
-    jobs := make([]string, 3)
-    jobs[0] = "sleep 2 && echo 1"
-    jobs[1] = "sleep 10 && echo 2"
-    jobs[2] = "echo 'test'"
-    executor.AsyncExecuteJobs(jobs)
+    jobs_list := [][]string{job.Jobs["tcp_dump"], job.Jobs["list"]}
+    executor.AsyncExecuteJobs(jobs_list)
 }
