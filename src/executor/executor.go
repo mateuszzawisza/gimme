@@ -5,22 +5,36 @@ import (
     "os/exec"
     "sync"
 )
+type Job struct{
+    Commands []string
+}
+
+type JobsList struct{
+    Jobs []Job
+}
 
 func Execute(job string) {
-    out,_ := exec.Command("sh", "-c", job).Output()
-    fmt.Printf("%s",out)
+    out,err := exec.Command("sh", "-c", job).Output()
+    if err != nil {
+        fmt.Printf("[%s] failed\n",job)
+    }else {
+        fmt.Printf("[%s] %s\n",job, out)
+    }
 }
 
-func asyncExecute(job string, wg_handle *sync.WaitGroup) {
+func asyncExecute(commands []string, wg_handle *sync.WaitGroup) {
     defer wg_handle.Done()
-    Execute(job)
+    for i:= range commands{
+        Execute(commands[i])
+    }
 }
 
-func AsyncExecuteJobs(jobs_list []string) {
+func AsyncExecuteJobs(jobs_list JobsList) {
     var wg sync.WaitGroup
-    for i:= range jobs_list {
+    jobs := jobs_list.Jobs
+    for i:= range jobs {
         wg.Add(1)
-        go asyncExecute(jobs_list[i], &wg)
+        go asyncExecute(jobs[i].Commands, &wg)
     }
     wg.Wait()
 }
