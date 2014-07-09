@@ -4,30 +4,56 @@ import (
     "fmt"
     "os/exec"
     "sync"
-    "job"
+    "os"
+    "time"
 )
 
-func Execute(job string) {
-    _,err := exec.Command("sh", "-c", job).Output()
+type Job struct{
+    Command []string
+    Repeat int
+    Sleep int
+    Log_output bool
+}
+
+func execute(job string) []byte{
+    output,err := exec.Command("sh", "-c", job).Output()
     if err != nil {
         fmt.Printf("  Failed executing command: \"%s\"\n",job)
     }
+    return output
 }
 
-func asyncExecute(name string, task job.Job, wg_handle *sync.WaitGroup) {
+func asyncExecute(name string, task Job, wg_handle *sync.WaitGroup) {
     defer wg_handle.Done()
     fmt.Printf("Starting %s\n", name)
     for i:= range task.Command{
-        Execute(task.Command[i])
+        output := execute(task.Command[i])
+        if task.Log_output == true {
+            saveOutput(name,output)
+        }
+
     }
     fmt.Printf("Finished %s\n", name)
 }
 
-func AsyncExecuteJobs(jobs_list map[string]job.Job) {
+func AsyncExecuteJobs(jobs_list map[string]Job) {
     var wg sync.WaitGroup
     for name,jobs:= range jobs_list {
         wg.Add(1)
         go asyncExecute(name,jobs, &wg)
     }
     wg.Wait()
+}
+
+func saveOutput(name string, content []byte){
+    fo, err := os.OpenFile(name + ".log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0660);
+
+    if err != nil { panic(err) }
+    // close fo on exit and check for its returned error
+    defer func() {
+        fo.Close()
+    }()
+
+    fo.Write([]byte("===== Content inserted on " + time.Now().String() + "=====\n"))
+    fo.Write(content)
 }

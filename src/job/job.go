@@ -1,25 +1,21 @@
 package job
 
-type Job struct{
-    Command []string
-    Repeat int
-    Sleep int
-    Log_output bool
-}
-var Jobs = map[string]Job{
-    "tcp_dump": Job{
+import "executor"
+
+var Jobs = map[string]executor.Job{
+    "tcp_dump": executor.Job{
         []string{ "tcpdump -i eth0 -G 60 -W 1 -w tcp.pcap" },
         0,
         1,
         false,
     },
-    "connections_list": Job{
+    "connections_list": executor.Job{
         []string{ "ss -an" },
         5,
         1,
         true,
     },
-    "connections_stats": Job{
+    "connections_stats": executor.Job{
         []string{ "ss -s" },
         5,
         1,
