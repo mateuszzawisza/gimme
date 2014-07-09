@@ -16,7 +16,9 @@ func main() {
 
 func prepare(){
     dir:="/root/heman/" + time.Now().Format("20060102150405")
-    os.MkdirAll(dir,os.ModeDir)
-    os.Chdir(dir)
+    err:=os.MkdirAll(dir,os.ModeDir)
+    if err !=nil {panic(err)}
+    err=os.Chdir(dir)
+    if err !=nil {panic(err)}
     fmt.Println("Saving stats into ",dir)
 }
