@@ -1,9 +1,9 @@
 package main
 
 import "executor"
-import "job"
+import "jobs"
 
 
 func main() {
-    executor.AsyncExecuteJobs(job.Jobs)
+    executor.AsyncExecuteJobs(jobs.Jobs)
 }
