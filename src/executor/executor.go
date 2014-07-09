@@ -23,15 +23,26 @@ func execute(job string) []byte{
     return output
 }
 
-func asyncExecute(name string, task Job, wg_handle *sync.WaitGroup) {
-    defer wg_handle.Done()
-    fmt.Printf("Starting %s\n", name)
+func executeTasks(name string, task Job){
     for i:= range task.Command{
         output := execute(task.Command[i])
         if task.Log_output == true {
             saveOutput(name,output)
         }
 
+    }
+}
+
+func asyncExecute(name string, task Job, wg_handle *sync.WaitGroup) {
+    defer wg_handle.Done()
+    fmt.Printf("Starting %s\n", name)
+    if task.Repeat > 0{
+        for i:=0;i < task.Repeat;i++{
+            executeTasks(name, task)
+            time.Sleep(time.Duration(task.Sleep) * time.Second)
+        }
+    }else{
+        executeTasks(name, task)
     }
     fmt.Printf("Finished %s\n", name)
 }
