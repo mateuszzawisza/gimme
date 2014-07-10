@@ -21,4 +21,10 @@ var Jobs = map[string]executor.Job{
         5,
         true,
     },
+    "netstat": executor.Job{
+        []string{ "netstat -s || echo 0" },
+        12,
+        5,
+        true,
+    },
 }
