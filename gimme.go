@@ -15,7 +15,7 @@ func main() {
 }
 
 func prepare(){
-    dir:=os.Getenv("HOME") + "/heman_output/" + time.Now().Format("20060102150405")
+    dir:=os.Getenv("HOME") + "/gimme_output/" + time.Now().Format("20060102150405")
     err:=os.MkdirAll(dir,os.ModeDir)
     if err !=nil {panic(err)}
     err=os.Chdir(dir)
