@@ -10,7 +10,7 @@ var Jobs = map[string]executor.Job{
         false,
     },
     "connections_list": executor.Job{
-        []string{ "ss -an" },
+        []string{ "ss -aen" },
         12,
         5,
         true,
