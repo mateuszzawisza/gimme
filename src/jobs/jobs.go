@@ -27,4 +27,28 @@ var Jobs = map[string]executor.Job{
         5,
         true,
     },
+    "who": executor.Job{
+        []string{ "who","w" },
+        0,
+        0,
+        true,
+    },
+    "processlist": executor.Job{
+        []string{ "ps aux" },
+        12,
+        5,
+        true,
+    },
+    "iostat": executor.Job{
+        []string{ "iostat -x 3 20" },
+        0,
+        0,
+        true,
+    },
+    "uptime": executor.Job{
+        []string{ "uptime" },
+        6,
+        10,
+        true,
+    },
 }
