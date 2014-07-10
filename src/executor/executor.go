@@ -6,6 +6,7 @@ import (
     "sync"
     "os"
     "time"
+    "strconv"
 )
 
 type Job struct{
@@ -38,7 +39,8 @@ func asyncExecute(name string, task Job, wg_handle *sync.WaitGroup) {
     fmt.Printf("Starting %s\n", name)
     if task.Repeat > 0{
         for i:=0;i < task.Repeat;i++{
-            executeTasks(name, task)
+            task_name := name + "." + strconv.Itoa(i)
+            executeTasks(task_name, task)
             time.Sleep(time.Duration(task.Sleep) * time.Second)
         }
     }else{
