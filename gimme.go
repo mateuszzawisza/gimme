@@ -11,6 +11,8 @@ import (
 	"github.com/mateuszzawisza/gimme/executor"
 	"github.com/mateuszzawisza/gimme/jobs"
 
+	"log"
+
 	"launchpad.net/goamz/aws"
 	"launchpad.net/goamz/s3"
 )
@@ -52,39 +54,39 @@ func s3Uploader(aws_access_key_id, aws_secret_access_key, aws_bucket, file_path 
 	hostname, _ := os.Hostname()
 	_, file_name := dir_and_file_name(file_path)
 	s3_path := fmt.Sprintf("%s/%s", hostname, file_name)
-	fmt.Printf("Uploading file to https://s3.amazonaws.com/%s/%s\n", bucket_name, s3_path)
+	log.Printf("Uploading file to https://s3.amazonaws.com/%s/%s\n", bucket_name, s3_path)
 	err := diag_bucket.Put(s3_path, content, "application/x-compressed", s3.BucketOwnerFull)
 	if err != nil {
-		panic(err)
+		log.Panic("Failed to upload file", err)
 	}
-	fmt.Println("Done")
+	log.Println("Done")
 }
 
 func prepare() string {
 	path := os.Getenv("HOME") + "/gimme_output/" + time.Now().Format("20060102150405")
 	err := os.MkdirAll(path, os.ModeDir|0755)
 	if err != nil {
-		panic(err)
+		log.Panicf("Failed to create output directory: %s\n", path, err)
 	}
 	err = os.Chdir(path)
 	if err != nil {
-		panic(err)
+		log.Panicf("Failed to change dir to output directory: %s\n", path, err)
 	}
-	fmt.Println("Saving stats into ", path)
+	log.Println("Saving stats into ", path)
 	return path
 }
 
 func compress(dir, output_name string) string {
 	err := os.Chdir(dir)
 	if err != nil {
-		panic(err)
+		log.Panicf("Failed to change dir to output directory: %s\n", dir, err)
 	}
 
-	fmt.Printf("Creating tgz archive:  %s/%s.tar.gz\n", dir, output_name)
+	log.Printf("Creating tgz archive:  %s/%s.tar.gz\n", dir, output_name)
 	tar_command := fmt.Sprintf("tar cvzf %s.tar.gz %s", output_name, output_name)
 	_, err = exec.Command("sh", "-c", tar_command).Output()
 	if err != nil {
-		panic(err)
+		log.Panicf("Failed to execute: %s\n", tar_command, err)
 	}
 	return fmt.Sprintf("%s/%s.tar.gz", dir, output_name)
 }
