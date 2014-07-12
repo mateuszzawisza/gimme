@@ -62,7 +62,7 @@ func s3Uploader(aws_access_key_id, aws_secret_access_key, aws_bucket, file_path 
 
 func prepare() string {
 	path := os.Getenv("HOME") + "/gimme_output/" + time.Now().Format("20060102150405")
-	err := os.MkdirAll(path, os.ModeDir)
+	err := os.MkdirAll(path, os.ModeDir|0755)
 	if err != nil {
 		panic(err)
 	}
