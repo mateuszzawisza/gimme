@@ -30,7 +30,6 @@ func executeTasks(name string, task Job){
         if task.Log_output == true {
             saveOutput(name,output)
         }
-
     }
 }
 
