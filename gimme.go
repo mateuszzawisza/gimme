@@ -37,11 +37,6 @@ func main() {
 
 func s3Uploader(aws_access_key_id, aws_secret_access_key, aws_bucket, file_path string) {
 	file, _ := os.Open(file_path)
-	file_stat, _ := file.Stat()
-	file_size := file_stat.Size()
-	content := make([]byte, file_size)
-	file.Read(content)
-
 	auth := aws.Auth{
 		AccessKey: aws_access_key_id,
 		SecretKey: aws_secret_access_key,
@@ -55,8 +50,14 @@ func s3Uploader(aws_access_key_id, aws_secret_access_key, aws_bucket, file_path 
 	_, file_name := dir_and_file_name(file_path)
 	s3_path := fmt.Sprintf("%s/%s", hostname, file_name)
 	log.Printf("Uploading file to https://s3.amazonaws.com/%s/%s\n", bucket_name, s3_path)
-	err := diag_bucket.Put(s3_path, content, "application/x-compressed", s3.BucketOwnerFull)
-	if err != nil {
+
+	multi, err := diag_bucket.InitMulti(s3_path, "application/x-compressed", s3.BucketOwnerFull)
+	parts, multi_err := multi.PutAll(file, 5*1048576)
+	if multi_err != nil {
+		log.Panic("Failed to upload file", err)
+	}
+	complete_err := multi.Complete(parts)
+	if complete_err != nil {
 		log.Panic("Failed to upload file", err)
 	}
 	log.Println("Done")
