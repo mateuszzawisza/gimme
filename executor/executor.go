@@ -58,16 +58,13 @@ func AsyncExecuteJobs(jobs_list map[string]Job) {
 }
 
 func saveOutput(name string, content []byte) {
-	fo, err := os.OpenFile(name+".log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0660)
+	file, err := os.OpenFile(name+".log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0660)
 
 	if err != nil {
 		panic(err)
 	}
-	// close fo on exit and check for its returned error
-	defer func() {
-		fo.Close()
-	}()
+	defer file.Close()
 
-	fo.Write([]byte("===== Content inserted on " + time.Now().String() + "=====\n"))
-	fo.Write(content)
+	file.Write([]byte("===== Content inserted on " + time.Now().String() + "=====\n"))
+	file.Write(content)
 }

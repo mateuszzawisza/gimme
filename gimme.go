@@ -37,6 +37,7 @@ func main() {
 
 func s3Uploader(aws_access_key_id, aws_secret_access_key, aws_bucket, file_path string) {
 	file, _ := os.Open(file_path)
+	defer file.Close()
 	auth := aws.Auth{
 		AccessKey: aws_access_key_id,
 		SecretKey: aws_secret_access_key,
