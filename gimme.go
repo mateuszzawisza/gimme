@@ -4,31 +4,31 @@ import (
 	"flag"
 	"os"
 
-	"time"
-
 	"github.com/mateuszzawisza/gimme/archivist"
 	"github.com/mateuszzawisza/gimme/executor"
 	"github.com/mateuszzawisza/gimme/jobs"
 
+	"time"
+
 	"log"
 )
 
-type Options struct {
-	AwsBucket, AwsAccessKeyId, AwsSecretAccessKey string
-}
-
-func gather_flags() Options {
-	var aws_bucket = flag.String("aws-bucket", "my-bucket-name", "Set the bucket name for the diagnostic information to be uploaded to")
-	var aws_access_key_id = flag.String("aws-access-key-id", "ACCESS_KEY_ID", "Set the access key id for AWS API communication")
-	var aws_secret_access_key = flag.String("aws-secret-access-key", "SECRET_ACCESS_KEY_ID", "Set the secret access key for AWS API communication")
-	flag.Parse()
-	options := Options{
-		AwsBucket:          *aws_bucket,
-		AwsAccessKeyId:     *aws_access_key_id,
-		AwsSecretAccessKey: *aws_secret_access_key,
-	}
-	return options
-}
+var awsBucket = flag.String(
+	"aws-bucket",
+	"my-bucket-name",
+	"Set the bucket name for the diagnostic information to be uploaded to",
+)
+var awsAccessKeyId = flag.String(
+	"aws-access-key-id",
+	"ACCESS_KEY_ID",
+	"Set the access key id for AWS API communication",
+)
+var awsSecretAccessKey = flag.String(
+	"aws-secret-access-key",
+	"SECRET_ACCESS_KEY_ID",
+	"Set the secret access key for AWS API communication",
+)
+var uploadToS3 = flag.Bool("upload-to-s3", false, "Upload files to s3 bucket?")
 
 func prepare() string {
 	path := os.Getenv("HOME") + "/gimme_output/" + time.Now().Format("20060102150405")
@@ -45,14 +45,16 @@ func prepare() string {
 }
 
 func main() {
-	options := gather_flags()
+	flag.Parse()
 	path := prepare()
 	executor.AsyncExecuteJobs(jobs.Jobs)
 	compressed_file_path := archivist.Compress(path)
-	archivist.S3Upload(
-		options.AwsAccessKeyId,
-		options.AwsSecretAccessKey,
-		options.AwsBucket,
-		compressed_file_path,
-	)
+	if *uploadToS3 == true {
+		archivist.S3Upload(
+			*awsAccessKeyId,
+			*awsSecretAccessKey,
+			*awsBucket,
+			compressed_file_path,
+		)
+	}
 }
