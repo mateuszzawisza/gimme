@@ -13,8 +13,14 @@ go build gimme.go
 
 ##Run
 
+To simply gather some data and create a tgz archive run gimme without any arguments
 ```shell
-gimme -aws-access-key-id=AAA -aws-secret-access-key=BBB -aws-bucket=my-bucket-name
+gimme
+```
+
+gimme can upload the tgz archive to specified S3 bucket. To do so add arguments like in the example below.
+```shell
+gimme -upload-to-s3 -aws-access-key-id=AAA -aws-secret-access-key=BBB -aws-bucket=my-bucket-name
 ```
 
 Sample output
